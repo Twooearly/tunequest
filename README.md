@@ -1,12 +1,12 @@
 # IMPORTANT
-Using the Spotify API to creat Games like e.g. [Games or trivia quizzes is against the their terms and conditions](https://developer.spotify.com/compliance-tips#disallowed-use-cases). Therefor use/host it at your own risk.
+Using the Spotify API to create Games like e.g. [games or trivia quizzes is against their terms and conditions](https://developer.spotify.com/compliance-tips#disallowed-use-cases). Therefore use/host it at your own risk.
 
 # TuneQuest
 
 Welcome to TuneQuest, a music guessing game that will put your music knowledge to the test! 
 Inspired by the board game Hitster, TuneQuest brings the excitement and challenge of guessing iconic tracks right to your table.
 Are you a music aficionado? A casual listener? Or just someone who loves a good challenge? TuneQuest has something for everyone. 
-With the whole Spotify library to choose from, there's always a new challenge awaiting you.
+With the entire Spotify library to choose from, there's always a new challenge awaiting you.
 How well do you know your favorite artists' discographies? 
 Can you pinpoint the exact year that legendary albums were released? 
 TuneQuest will push your memory and musical knowledge to the limit as you compete against friends or test your skills solo.
@@ -15,7 +15,7 @@ TuneQuest will push your memory and musical knowledge to the limit as you compet
 
 Due to the Spotify API restrictions, the game can only be played by users with a Spotify Premium account.
 Also due to the nature of web browsers in general, the first scanned song may not play automatically and you may have to click on the play button to start the song.
-This is a feature of the web browsers to prevent autoplaying of media content that is often times unwanted by the user.
+This is a feature of the web browsers to prevent autoplaying of media content that is often unwanted by the user.
 
 ## Getting Started
 
@@ -67,6 +67,24 @@ pnpm start
 bun start
 ```
 
+## Local testing with SSL support (HTTPS)
+
+In order to perform local test with ssl (HTTPS), create a self-signed certificate with the following command and put it in `./certs`. Adjust you local IP/hostname.
+
+```bash
+openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
+  -keyout tunequest.key -out tunequest.crt \
+  -subj "/CN=<YOUR.LOCAL.IP>"
+```
+
+Start the development server with
+
+```bash
+npm run dev:https
+```
+
+The application should be available at https://<YOUR.LOCAL.IP>:3000/
+
 ## Docker
 
 Build the docker image:
@@ -75,7 +93,7 @@ docker build -t tunequest .
 ```
 
 Create the following `docker-compose.yaml` file:
-```dockerfile
+```yaml
 services:
   tunequest:
     container_name: tunequest
@@ -83,6 +101,14 @@ services:
     restart: unless-stopped
     ports:
       - 3000:3000
+    environment:
+      SPOTIFY_AUTHORIZE_URL: https://accounts.spotify.com/authorize
+      SPOTIFY_API_TOKEN_URL: https://accounts.spotify.com/api/token
+      SPOTIFY_REDIRECT_URI: http://localhost:3000/player
+      SPOTIFY_CLIENT_SECRET: xxx
+      SPOTIFY_CLIENT_ID: xxx
+      SPOTIFY_SCOPES: user-modify-playback-state streaming user-read-email user-read-private
+      TUNEQUEST_CREATE_URL: http://localhost:5173
 ```
 
 Run the docker image with docker compose:
